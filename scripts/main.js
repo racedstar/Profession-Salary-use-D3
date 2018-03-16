@@ -26,14 +26,11 @@ var charts = function(rawData){
     var margin = 50;
     var svgWidth = 1600 - margin;
     var svgHeight =500 - margin;
-    var dataset = rawData;
-    console.log(dataset);
+    var dataset = rawData;    
     var yMax = d3.max(dataset, function(data){
         return data.salary;
-    })
-    var yMin = d3.min(dataset, function(data){
-        return data.salary;
-    })   
+    });
+
     //算出x的位置
     var xScale = d3.scaleBand()
                     .domain(dataset.map(function(d){
@@ -75,20 +72,6 @@ var charts = function(rawData){
             }
         });
 
-    svg.append('g')
-        .attrs({
-            'transform': 'translate(0,' + (svgHeight + 10) + ')'            
-        })
-        .call(xAxis);
-    
-    svg.append('g') 
-        .attrs({
-            'transform': 'translate(' + (margin - 10) + ', ' + 0 + ')'
-        })       
-        .call(yAxis)
-
-
-
     svg.selectAll('text')
     .data(dataset)
     .enter()
@@ -101,10 +84,24 @@ var charts = function(rawData){
             return xScale(data.profession);
         },
         y: function(data){
-            return svgHeight - yScale(data.salary);
+            return svgHeight - yScale(data.salary) + 20;
         },
         fill: 'black',
-        'font-size': '14px'
-    });        
+        'font-size': '14px',
+        'text-anchor':'right'
+    });           
 
+    svg.append('g')
+        .attrs({
+            'transform': 'translate(-5,' + (svgHeight + 10) + ')'            
+        })
+        .call(xAxis);
+    
+    svg.append('g') 
+        .attrs({
+            'transform': 'translate(' + (margin - 5) + ', ' + 10 + ')'
+        })       
+        .call(yAxis);
+
+ 
 }
