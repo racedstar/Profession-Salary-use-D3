@@ -43,9 +43,13 @@ var charts = function(rawData){
                     .domain([0, yMax])
                     .range([0, svgHeight]);
 
+    var yScaleAxis = d3.scaleLinear()
+                        .domain([0, yMax])                    
+                        .range([svgHeight, 0])
+
     var xAxis = d3.axisBottom(xScale);
 
-    var yAxis = d3.axisLeft(yScale);
+    var yAxis = d3.axisLeft(yScaleAxis);
 
     var svg = d3.select('body')
         .append('svg')
@@ -93,13 +97,13 @@ var charts = function(rawData){
 
     svg.append('g')
         .attrs({
-            'transform': 'translate(-5,' + (svgHeight + 10) + ')'            
+            'transform': 'translate(0,' + (svgHeight) + ')'            
         })
         .call(xAxis);
     
     svg.append('g') 
         .attrs({
-            'transform': 'translate(' + (margin - 5) + ', ' + 10 + ')'
+            'transform': 'translate(' + (margin) + ', ' + 10 + ')'
         })       
         .call(yAxis);
 
