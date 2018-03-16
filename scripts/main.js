@@ -26,7 +26,19 @@ var charts = function(rawData){
     var margin = 50;
     var svgWidth = 1600 - margin;
     var svgHeight =500 - margin;
-    var dataset = rawData;    
+    var dataset = rawData;
+    
+    //testData
+    // var dataset = [{
+    //     profession: 'A',
+    //     salary: 10
+    // },{
+    //     profession: 'B',
+    //     salary: 20
+    // },{
+    //     profession: 'C',
+    //     salary: 30
+    // }];
     var yMax = d3.max(dataset, function(data){
         return data.salary;
     });
@@ -39,6 +51,7 @@ var charts = function(rawData){
                     .range([margin, svgWidth])
                     .paddingInner(0.3);
     
+    //算出所有薪水的長條圖                    
     var yScale = d3.scaleLinear()
                     .domain([0, yMax])
                     .range([0, svgHeight]);
@@ -51,12 +64,22 @@ var charts = function(rawData){
 
     var yAxis = d3.axisLeft(yScaleAxis);
 
+    var tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .offset([-10, 0])
+                .html(function(d){
+                    return "<strong>Profession: </strong><sapn style=color: blue>" + d.profession + "</span><br />" + "<strong>Salary: </strong><span style='color: red'>" + d.salary + '</span>'
+                })
+
     var svg = d3.select('body')
         .append('svg')
         .attrs({
-            width: svgWidth + 50,
-            height: svgHeight + 100
+            width: svgWidth + margin,
+            height: svgHeight + margin,
+            'style': 'padding-top: 30px; '
         });    
+
+    svg.call(tip);
 
     svg.selectAll('rect')
         .data(dataset)
@@ -74,26 +97,28 @@ var charts = function(rawData){
             height: function(data){
                 return yScale(data.salary);
             }
-        });
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
-    svg.selectAll('text')
-    .data(dataset)
-    .enter()
-    .append('text')
-    .text(function(data){
-        return data.salary;
-    })
-    .attrs({
-        x: function(data){
-            return xScale(data.profession);
-        },
-        y: function(data){
-            return svgHeight - yScale(data.salary) + 20;
-        },
-        fill: 'black',
-        'font-size': '14px',
-        'text-anchor':'right'
-    });           
+    // svg.selectAll('text')
+    // .data(dataset)
+    // .enter()
+    // .append('text')
+    // .text(function(data){
+    //     return data.salary;
+    // })
+    // .attrs({
+    //     x: function(data){
+    //         return xScale(data.profession);
+    //     },
+    //     y: function(data){
+    //         return svgHeight - yScale(data.salary) + 20;
+    //     },
+    //     fill: 'black',
+    //     'font-size': '14px',
+    //     'text-anchor':'right'
+    // });           
 
     svg.append('g')
         .attrs({
@@ -103,9 +128,7 @@ var charts = function(rawData){
     
     svg.append('g') 
         .attrs({
-            'transform': 'translate(' + (margin) + ', ' + 10 + ')'
+            'transform': 'translate(' + (margin) + ', ' + 0 + ')'
         })       
         .call(yAxis);
-
- 
 }
