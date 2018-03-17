@@ -1,9 +1,14 @@
 $(document).ready(function(){
-    var data = getData();
+    var data = getData(2);
     charts(data);
+
+    $('#changeData').click(function(){
+        data = getData(4);
+        charts(data);
+    })
 })
 
-var getData = function(){
+var getData = function(type){
     $.ajaxSettings.async = false;
     var rawData = new Array();
     $.getJSON('./A17000000J-020066-mAH.json', function(data){
@@ -14,7 +19,7 @@ var getData = function(){
             }
             var seriesData = {
                 profession: data[i][keys[1]],//set職業名稱
-                salary: parseInt(data[i][keys[2]])//set薪資(int)
+                salary: parseInt(data[i][keys[type]])//set薪資(int)
             }
             rawData.push(seriesData);
         }
@@ -39,6 +44,8 @@ var charts = function(rawData){
     //     profession: 'C',
     //     salary: 30
     // }];
+    
+    //取得最高的薪資
     var yMax = d3.max(dataset, function(data){
         return data.salary;
     });
@@ -56,31 +63,35 @@ var charts = function(rawData){
                     .domain([0, yMax])
                     .range([0, svgHeight]);
 
+    //給yAxis用
     var yScaleAxis = d3.scaleLinear()
                         .domain([0, yMax])                    
                         .range([svgHeight, 0])
 
     var xAxis = d3.axisBottom(xScale);
-
     var yAxis = d3.axisLeft(yScaleAxis);
 
+    //tooltip
     var tip = d3.tip()
                 .attr('class', 'd3-tip')
                 .offset([-10, 0])
                 .html(function(d){
                     return "<strong>Profession: </strong><sapn style=color: blue>" + d.profession + "</span><br />" + "<strong>Salary: </strong><span style='color: red'>" + d.salary + '</span>'
                 })
-
+    
+    //在body內畫出svg
     var svg = d3.select('body')
         .append('svg')
         .attrs({
             width: svgWidth + margin,
-            height: svgHeight + margin,
-            'style': 'padding-top: 30px; '
+            height: svgHeight + margin + 50,
+            'style': 'padding-top: 50px; '
         });    
 
+    //Call tooltip
     svg.call(tip);
 
+    //畫出長條圖
     svg.selectAll('rect')
         .data(dataset)
         .enter()
@@ -100,35 +111,19 @@ var charts = function(rawData){
         })
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
-
-    // svg.selectAll('text')
-    // .data(dataset)
-    // .enter()
-    // .append('text')
-    // .text(function(data){
-    //     return data.salary;
-    // })
-    // .attrs({
-    //     x: function(data){
-    //         return xScale(data.profession);
-    //     },
-    //     y: function(data){
-    //         return svgHeight - yScale(data.salary) + 20;
-    //     },
-    //     fill: 'black',
-    //     'font-size': '14px',
-    //     'text-anchor':'right'
-    // });           
-
+     
+    //畫出X軸
     svg.append('g')
         .attrs({
-            'transform': 'translate(0,' + (svgHeight) + ')'            
+            'transform': 'translate(0,' + (svgHeight) + ')',
+            'class': 'xAxis'
         })
         .call(xAxis);
     
+    //畫出Y軸
     svg.append('g') 
         .attrs({
-            'transform': 'translate(' + (margin) + ', ' + 0 + ')'
+            'transform': 'translate(' + (margin - 10) + ', ' + 0 + ')'
         })       
         .call(yAxis);
 }

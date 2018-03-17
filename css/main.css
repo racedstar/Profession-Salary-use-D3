@@ -25,7 +25,11 @@
 
 /* Style northward tooltips specifically */
 .d3-tip.n:after {
-    margin: -2px 0 0 0;
+    margin: -2px 0 0 0;s
     top: 100%;
     left: 0;
-}   
+}
+.xAxis g text{
+    transform-origin: 40px 30px 0px;
+    transform: rotate(-45deg);
+}
