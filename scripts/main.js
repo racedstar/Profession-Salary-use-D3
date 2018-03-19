@@ -32,19 +32,7 @@ var charts = function(rawData){
     var svgWidth = 1600 - margin;
     var svgHeight =500 - margin;
     var dataset = rawData;
-    
-    //testData
-    // var dataset = [{
-    //     profession: 'A',
-    //     salary: 10
-    // },{
-    //     profession: 'B',
-    //     salary: 20
-    // },{
-    //     profession: 'C',
-    //     salary: 30
-    // }];
-    
+
     //取得最高的薪資
     var yMax = d3.max(dataset, function(data){
         return data.salary;
@@ -92,7 +80,7 @@ var charts = function(rawData){
     svg.call(tip);
 
     //畫出長條圖
-    svg.selectAll('rect')
+    svg.selectAll('.bar')
         .data(dataset)
         .enter()
         .append('rect')
