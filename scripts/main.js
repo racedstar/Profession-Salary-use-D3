@@ -29,7 +29,7 @@ var getData = function(type){
 
 var charts = function(rawData){
     var margin = 50;
-    var svgWidth = 1600 - margin;
+    var svgWidth = 800 - margin;
     var svgHeight =500 - margin;
     var dataset = rawData;
 

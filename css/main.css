@@ -30,6 +30,7 @@
     left: 0;
 }
 .xAxis g text{
-    transform-origin: 40px 30px 0px;
+    /* transform-origin: 40px 30px 0px; */
+    text-anchor:end;
     transform: rotate(-45deg);
 }
