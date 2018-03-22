@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
         <script src="https://d3js.org/d3.v4.min.js"></script> <!--引入d3.js-->
         <script src="https://d3js.org/d3-scale.v2.min.js"></script>
@@ -10,8 +11,14 @@
         <link rel="stylesheet" type="text/css" href="css/main.css">
     </head>
     <body>
-        <div id="container">
-            <!-- <input id="changeData" type="button" value="changeData" /> -->
+        <div id="btnMenu">
+            <input id="btnRecurring" type="button" value="經常性薪資-薪資">
+            <input id="btnSecondary" type="button" value="中學以下薪資">
+            <input id="btnHighSchool" type="button" value="高中薪資">
+            <input id="btnSpecialist" type="button" value="專科薪資">
+            <input id="btnUniversity" type="button" value="大學薪資">
+            <input id="btnGraduateSchool" type="button" value="研究所薪資">
         </div>
+        <div id="divCharts"></div>
     </body>
 </html>
