@@ -142,20 +142,19 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){
     svg.selectAll('.yAxis').transition().duration(1000).call(yAxis);
 
     //畫出長條圖
-    svg.selectAll('.bar')
+    var bar = svg.selectAll('.bar')
+        .remove()
         .exit()
         .data(rawData)
-        .enter()
+        
+        bar.enter()
         .append('rect')
         .classed('bar', true)
         .call(tip)
         .attrs({
             x: function(data){
                 return xScale(data.profession);
-            },
-            y: 0,
-            width: xScale.bandwidth(),
-            height: 0
+            }
         })
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
@@ -164,12 +163,12 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){
         .transition()
         .duration(1000)
         .attrs({
+            width: xScale.bandwidth(),
             y: function(data){
                 return svgHeight - yScale(data.salary);
             },
             height: function(data){                
                 return yScale(data.salary);
-                
             }
         });
 }
