@@ -154,7 +154,10 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){
         .attrs({
             x: function(data){
                 return xScale(data.profession);
-            }
+            },
+            width: xScale.bandwidth(),
+            y: svgHeight,
+            height: 0
         })
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
