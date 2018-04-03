@@ -77,7 +77,8 @@ var getData = function(type){
 //(chartdata, svg寬度, svg高度, 間距)
 var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){    
     svgWidth = svgWidth - margin;
-    svgHeight = svgHeight - margin;    
+    svgHeight = svgHeight - margin;  
+    var color = d3.scaleOrdinal(d3.schemeCategory20);  
 
     var yMax = d3.max(rawData, function(data){
         return data.salary;
@@ -172,6 +173,9 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){
             },
             height: function(data){                
                 return yScale(data.salary);
+            },
+            fill: function(d, i){
+                return color(i);
             }
         });
 }
