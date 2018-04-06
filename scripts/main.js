@@ -2,61 +2,25 @@ $(document).ready(function(){
     var svgWidth = 800;
     var svgHeight = 400;
     var margin = 50;
-    var data = getData('Recurring');
+    var education = 'Recurring';
+    var data = getData(education);
 
-    drawCharts(data, svgWidth, svgHeight, margin, false);
+    drawCharts(data, svgWidth, svgHeight, margin);
 
-    $('#btnRecurring').click(function(){
-        data = getData('Recurring');
-        drawCharts(data, svgWidth, svgHeight, margin, true);
-    })
-    $('#btnSecondary').click(function(){
-        data = getData('Secondary');
-        drawCharts(data, svgWidth, svgHeight, margin, true);
-    })
-    $('#btnHighSchool').click(function(){
-        data = getData('HighSchool');
-        drawCharts(data, svgWidth, svgHeight, margin, true);
-    })
-    $('#btnSpecialist').click(function(){
-        data = getData('Specialist');
-        drawCharts(data, svgWidth, svgHeight, margin, true);
-    })
-    $('#btnUniversity').click(function(){
-        data = getData('University');
-        drawCharts(data, svgWidth, svgHeight, margin, true);
-    })
-    $('#btnGraduateSchool').click(function(){
-        data = getData('GraduateSchool');
-        drawCharts(data, svgWidth, svgHeight, margin, true);
+    $('.btn').click(function(){        
+        education = $(this).data('education');
+        data = getData(education);
+        drawCharts(data, svgWidth, svgHeight, margin);
     })
 })
 
 var getData = function(type){
     $.ajaxSettings.async = false;
-    var rawData = new Array();
+    var rawData = new Array();    
+    var arrType = ['Recurring', 'Secondary', 'HighSchool', 'Specialist', 'University', 'GraduateSchool'];
     var category = 2;
+    category = (arrType.indexOf(type) + 1) * 2;
 
-    switch(type){
-        case 'Recurring':  //經常性薪資
-            category = 2;
-            break;
-        case 'Secondary':  //學歷中學以下薪資
-            category = 4;
-            break;
-        case 'HighSchool':  //學歷高中薪資
-            category = 6;
-            break;
-        case 'Specialist':  //學歷專科薪資
-            category = 8;
-            break;
-        case 'University': //'學歷大學薪資'
-            category = 10;
-            break;
-        case 'GraduateSchool':  //'學歷研究所薪資'
-            category = 12;
-            break;
-    }
 
     $.getJSON('./A17000000J-020066-mAH.json', function(data){
         var keys = Object.getOwnPropertyNames(data[0]);
@@ -75,7 +39,7 @@ var getData = function(type){
 }
 
 //(chartdata, svg寬度, svg高度, 間距)
-var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){    
+var drawCharts = function(rawData, svgWidth, svgHeight, margin){    
     svgWidth = svgWidth - margin;
     svgHeight = svgHeight - margin;  
     var color = d3.scaleOrdinal(d3.schemeCategory20);  
@@ -122,7 +86,7 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){
         });
 
     //畫出x,y軸
-    if(ifUpdate == false){
+    if($('.xAxis').length == 0 && $('.yAxis').length == 0){
         svg.append('g')
         .attrs({
             'class': 'xAxis',
