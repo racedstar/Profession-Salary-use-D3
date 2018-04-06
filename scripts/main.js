@@ -144,14 +144,11 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){
 
     //畫出長條圖
     var bar = svg.selectAll('.bar')
-        .remove()
-        .exit()
         .data(rawData)
         
         bar.enter()
         .append('rect')
         .classed('bar', true)
-        .call(tip)
         .attrs({
             x: function(data){
                 return xScale(data.profession);
@@ -159,9 +156,7 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){
             width: xScale.bandwidth(),
             y: svgHeight,
             height: 0
-        })
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
+        });
         
     svg.selectAll('.bar')
         .transition()
@@ -178,4 +173,10 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin, ifUpdate){
                 return color(i);
             }
         });
+        
+    svg.selectAll('.bar')
+        .call(tip)
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
+    
 }
