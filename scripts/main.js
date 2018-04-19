@@ -162,11 +162,13 @@ var drawCharts = function(education, rawData, svgWidth, svgHeight, margin, ifMai
         $('.d3-tip').remove();
         
         if(ifMainData == true){
+            $('#btnMenu').hide();
             var profession = $(this).data('profession');
             var childData = getData(education, profession);
             drawCharts(education, childData, svgWidth, svgHeight, margin, false, true);
         }
         if(ifMainData == false){
+            $('#btnMenu').show();
             var childData = getData(education);
             drawCharts(education, childData, svgWidth, svgHeight, margin, true, true);
         }
