@@ -2,32 +2,43 @@ $(document).ready(function(){
     var svgWidth = 800;
     var svgHeight = 400;
     var margin = 50;
-    var education = 'Recurring';
-    var data = getData(education);
+    var data = getData('Recurring');
 
-    drawCharts(data, svgWidth, svgHeight, margin);
+    drawCharts('Recurring', data, svgWidth, svgHeight, margin, true, false);
 
     $('.btn').click(function(){        
         education = $(this).data('education');
         data = getData(education);
-        drawCharts(data, svgWidth, svgHeight, margin);
+        drawCharts(education, data, svgWidth, svgHeight, margin, true, false);
     })
 })
 
-var getData = function(type){
+var getData = function(education, profession){
     $.ajaxSettings.async = false;
     var rawData = new Array();    
-    var arrType = ['Recurring', 'Secondary', 'HighSchool', 'Specialist', 'University', 'GraduateSchool'];
+    var objType = {
+        Recurring: 2,
+        Secondary: 4,
+        HighSchool: 6,
+        Specialist: 8,
+        University: 10,
+        GraduateSchool: 12
+    };
     var category = 2;
-    category = (arrType.indexOf(type) + 1) * 2;
-
+    category = objType[education];
 
     $.getJSON('./A17000000J-020066-mAH.json', function(data){
         var keys = Object.getOwnPropertyNames(data[0]);
         for(var i = 0; i < data.length; i++){
-            if(data[i][keys[1]].indexOf('-') >= 0){
+            if(profession == null){ //主類別走這條
+                if(data[i][keys[1]].indexOf('-') >= 0){
+                    continue;
+                }                
+            }
+            else if(data[i][keys[1]].indexOf('-') == -1 || data[i][keys[1]].indexOf(profession) == -1){//子類別走這條
                 continue;
             }
+
             var seriesData = {
                 profession: data[i][keys[1]],//set職業名稱
                 salary: parseInt(data[i][keys[category]])//set薪資(int)
@@ -38,16 +49,12 @@ var getData = function(type){
     return rawData;
 }
 
-//(chartdata, svg寬度, svg高度, 間距)
-var drawCharts = function(rawData, svgWidth, svgHeight, margin){    
-    svgWidth = svgWidth - margin;
-    svgHeight = svgHeight - margin;  
+//(學歷程度, chartdata, svg寬度, svg高度, 間距)
+var drawCharts = function(education, rawData, svgWidth, svgHeight, margin, ifMainData, ifChange){
     var color = d3.scaleOrdinal(d3.schemeCategory20);  
-
     var yMax = d3.max(rawData, function(data){
         return data.salary;
     });
-
     //算出x的位置
     var xScale = d3.scaleBand()
                     .domain(rawData.map(function(d){
@@ -105,23 +112,32 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin){
     
     svg.selectAll('.xAxis').transition().duration(1000).call(xAxis);
     svg.selectAll('.yAxis').transition().duration(1000).call(yAxis);
+    
 
     //畫出長條圖
+    if(ifChange == true){
+        svg.selectAll('.bar').remove()
+                             .exit()
+    }
+
     var bar = svg.selectAll('.bar')
-        .data(rawData)
-        
-        bar.enter()
-        .append('rect')
-        .classed('bar', true)
-        .attrs({
-            x: function(data){
-                return xScale(data.profession);
-            },
-            width: xScale.bandwidth(),
-            y: svgHeight,
-            height: 0
-        });
-        
+    .data(rawData)
+    .enter()
+    .append('rect')
+    .classed('bar', true)
+    .attrs({
+        x: function(data){
+            return xScale(data.profession);
+        },
+        width: xScale.bandwidth(),
+        y: svgHeight,
+        height: 0,
+        'data-profession': function(data){
+            return data.profession;
+        },
+        'data-education': education
+    });
+    
     svg.selectAll('.bar')
         .transition()
         .duration(1000)
@@ -137,10 +153,23 @@ var drawCharts = function(rawData, svgWidth, svgHeight, margin){
                 return color(i);
             }
         });
-        
+
     svg.selectAll('.bar')
-        .call(tip)
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
-    
+    .call(tip)
+    .on('mouseover', tip.show)
+    .on('mouseout', tip.hide)
+    .on('click', function(){
+        $('.d3-tip').remove();
+        
+        if(ifMainData == true){
+            var profession = $(this).data('profession');
+            var childData = getData(education, profession);
+            drawCharts(education, childData, svgWidth, svgHeight, margin, false, true);
+        }
+        if(ifMainData == false){
+            var childData = getData(education);
+            drawCharts(education, childData, svgWidth, svgHeight, margin, true, true);
+        }
+
+    })        
 }
