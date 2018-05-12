@@ -4,12 +4,12 @@ $(document).ready(function(){
     var margin = 50;
     var data = getData('Recurring');
 
-    drawCharts('Recurring', data, svgWidth, svgHeight, margin, true, false);
+    drawCharts('Recurring', data, svgWidth, svgHeight, margin, true, false, null, null);
 
     $('.btn').click(function(){        
         education = $(this).data('education');
         data = getData(education);
-        drawCharts(education, data, svgWidth, svgHeight, margin, true, false);
+        drawCharts(education, data, svgWidth, svgHeight, margin, true, false, null, null);
     })
 })
 
@@ -50,11 +50,17 @@ var getData = function(education, profession){
 }
 
 //(學歷程度, chartdata, svg寬度, svg高度, 間距)
-var drawCharts = function(education, rawData, svgWidth, svgHeight, margin, ifMainData, ifChange){
+var drawCharts = function(education, rawData, svgWidth, svgHeight, margin, ifMainData, ifChange, x, y){
     var color = d3.scaleOrdinal(d3.schemeCategory20);  
     var yMax = d3.max(rawData, function(data){
         return data.salary;
     });
+
+
+    rawData = rawData.sort(function(a, b){
+        return d3.ascending(a.salary, b.salary);
+    });
+
     //算出x的位置
     var xScale = d3.scaleBand()
                     .domain(rawData.map(function(d){
@@ -83,7 +89,7 @@ var drawCharts = function(education, rawData, svgWidth, svgHeight, margin, ifMai
                 .html(function(d){
                     return "<strong>Profession: </strong><sapn style=color: blue>" + d.profession + "</span><br />" + "<strong>Salary: </strong><span style='color: red'>" + d.salary + '</span>'
                 });
-    
+
     //在body內畫出svg
     var svg = d3.select('svg')        
         .attrs({
@@ -110,50 +116,66 @@ var drawCharts = function(education, rawData, svgWidth, svgHeight, margin, ifMai
             .call(yAxis);
     }
     
-    svg.selectAll('.xAxis').transition().duration(1000).call(xAxis);
-    svg.selectAll('.yAxis').transition().duration(1000).call(yAxis);
-    
-
     //畫出長條圖
     if(ifChange == true){
         svg.selectAll('.bar').remove()
                              .exit()
     }
 
+    var delay = function(d, i) { return i * 50; };
+
     var bar = svg.selectAll('.bar')
-    .data(rawData)
+    .data(rawData, function(d){
+        return d.profession;
+    })
     .enter()
     .append('rect')
     .classed('bar', true)
     .attrs({
-        x: function(data){
-            return xScale(data.profession);
+        x: function(d){
+            if(x != null){
+                return x;
+            }
+            return xScale(d.profession);
         },
-        width: xScale.bandwidth(),
-        y: svgHeight,
+        y: function(){
+            if(y != null){
+                return y;
+            }
+            return svgHeight;
+        },
         height: 0,
-        'data-profession': function(data){
-            return data.profession;
+        'data-profession': function(d){
+            return d.profession;
         },
         'data-education': education
     });
     
     svg.selectAll('.bar')
         .transition()
-        .duration(1000)
+        .delay(delay)
+        .duration(750)
         .attrs({
+            x: function(d){
+                return xScale(d.profession);
+            } ,
             width: xScale.bandwidth(),
-            y: function(data){
-                return svgHeight - yScale(data.salary);
+            y: function(d){
+                return svgHeight - yScale(d.salary);
             },
-            height: function(data){                
-                return yScale(data.salary);
+            height: function(d){                
+                return yScale(d.salary);
             },
             fill: function(d, i){
                 return color(i);
             }
         });
 
+    //x軸與y軸的動畫
+    svg.selectAll('.xAxis').transition().duration(750).call(xAxis).selectAll("g").delay(delay);
+    svg.selectAll('.yAxis').transition().delay(delay).duration(750).call(yAxis);    
+    
+    //給長條圖event
     svg.selectAll('.bar')
     .call(tip)
     .on('mouseover', tip.show)
@@ -165,13 +187,14 @@ var drawCharts = function(education, rawData, svgWidth, svgHeight, margin, ifMai
             $('#btnMenu').hide();
             var profession = $(this).data('profession');
             var childData = getData(education, profession);
-            drawCharts(education, childData, svgWidth, svgHeight, margin, false, true);
+            drawCharts(education, childData, svgWidth, svgHeight, margin, false, true, $(this).attr('x'), $(this).attr('y'));
         }
         if(ifMainData == false){
             $('#btnMenu').show();
             var childData = getData(education);
-            drawCharts(education, childData, svgWidth, svgHeight, margin, true, true);
+            drawCharts(education, childData, svgWidth, svgHeight, margin, true, true, $(this).attr('x'), $(this).attr('y'));
         }
 
     })        
 }
+
